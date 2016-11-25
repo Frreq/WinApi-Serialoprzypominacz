@@ -1,0 +1,347 @@
+#include <windows.h>
+#include <stdio.h>
+#include <time.h>
+#include <iostream>
+ 
+#define ID_CHECHBOX_1 501
+#define ID_CHECHBOX_2 502
+#define ID_CHECHBOX_3 503
+#define ID_CHECHBOX_4 504
+#define ID_CHECHBOX_5 505
+#define ID_CHECHBOX_6 506
+#define ID_CHECHBOX_7 507
+#define ID_SAVE_ALL 508
+#define ID_SAVE_MAIL 509
+ 
+using namespace std;
+ 
+struct STDH
+{
+//    int position;
+    bool status;
+    string Series_Title;
+    bool Monday;
+    bool Tuesday;
+    bool Wednesday;
+    bool Thursday;
+    bool Friday;
+    bool Saturday;
+    bool Sunday;
+    string hours;
+    string minutes;
+ 
+} List_STDH[50] ;
+ 
+ 
+// CHECKBOX BUTTON
+HWND ButtonDay_1;
+HWND ButtonDay_2;
+HWND ButtonDay_3;
+HWND ButtonDay_4;
+HWND ButtonDay_5;
+HWND ButtonDay_6;
+HWND ButtonDay_7;
+//TEXT INFO
+HWND Sub_Text;
+HWND Sub_Day_Ch;
+HWND Sub_List_STDH_TXT;
+HWND Sub_Hour_And_Minutes;
+//TEXT
+HWND Text_Mail_Adres;
+HWND Hour_TXT;
+HWND Minutes_TXT;
+HWND Text_Title;
+HWND List_STDH_ALL;
+//STANDARD BUTTON
+HWND Save_All;
+HWND Save_Mail;
+// COUNTER
+int Counter = 0;
+//POINTER BOOL
+//bool *All_Status;
+ 
+void Complete_Struct();
+ 
+ 
+LPSTR NazwaKlasy = "Window";
+MSG Komunikat;
+ 
+LRESULT CALLBACK WndProc( HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam );
+ 
+int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow )
+{
+ 
+    // WYPEŁNIANIE STRUKTURY
+    WNDCLASSEX wc;
+ 
+    wc.cbSize = sizeof( WNDCLASSEX );
+    wc.style = 0;
+    wc.lpfnWndProc = WndProc;
+    wc.cbClsExtra = 0;
+    wc.cbWndExtra = 0;
+    wc.hInstance = hInstance;
+    wc.hIcon = LoadIcon( NULL, IDI_APPLICATION );
+    wc.hCursor = LoadCursor( NULL, IDC_ARROW );
+    wc.hbrBackground =( HBRUSH )( COLOR_WINDOW + 1 );
+    wc.lpszMenuName = NULL;
+    wc.lpszClassName = NazwaKlasy;
+    wc.hIconSm = LoadIcon( NULL, IDI_APPLICATION );
+ 
+    // REJESTROWANIE KLASY OKNA
+    if( !RegisterClassEx( & wc ) )
+    {
+        MessageBox( NULL, 0, 0,
+        MB_ICONEXCLAMATION | MB_OK );
+        return 1;
+    }
+ 
+    // CREATE WINDOW
+    HWND hwnd;
+ 
+    hwnd = CreateWindowEx( WS_EX_CLIENTEDGE, NazwaKlasy, "SERIALO-PRZYPOMINACZ V1.0", WS_SYSMENU | WS_MINIMIZEBOX ,
+    300, 100, 900, 600, NULL, NULL, hInstance, NULL );
+ 
+    //BUTTON
+ 
+    //SAVE ALL BUTTON
+    Save_All = CreateWindowEx ( WS_EX_CLIENTEDGE , "BUTTON" , "ZAPISZ" , WS_CHILD | WS_VISIBLE | WS_BORDER ,
+                                50 , 500 , 200 , 50 , hwnd , (HMENU) ID_SAVE_ALL , hInstance , NULL );
+ 
+    Save_Mail = CreateWindowEx ( WS_EX_CLIENTEDGE , "BUTTON" , "ZAPISZ ADRES MAIL" , WS_CHILD | WS_VISIBLE | WS_BORDER ,
+                                600 , 500 , 200 , 50 , hwnd , (HMENU) ID_SAVE_MAIL , hInstance , NULL );
+ 
+ 
+    // CHECKBOXS FOR DAYS
+    ButtonDay_1 = CreateWindowEx ( 0 , "BUTTON" , "Poniedzialek" , WS_CHILD | WS_VISIBLE | BS_CHECKBOX | BS_AUTOCHECKBOX ,
+                                  50 , 125 , 120 , 20 , hwnd , (HMENU) ID_CHECHBOX_1 , hInstance , NULL );
+ 
+    ButtonDay_2 = CreateWindowEx ( 0 , "BUTTON" , "Wtorek" , WS_CHILD | WS_VISIBLE | BS_CHECKBOX | BS_AUTOCHECKBOX ,
+                                  50 , 150 , 120 , 20 , hwnd , (HMENU) ID_CHECHBOX_2 , hInstance , NULL );
+ 
+    ButtonDay_3 = CreateWindowEx ( 0 , "BUTTON" , "Sroda" , WS_CHILD | WS_VISIBLE | BS_CHECKBOX | BS_AUTOCHECKBOX,
+                                  50 , 175 , 120 , 20 , hwnd , (HMENU) ID_CHECHBOX_3 , hInstance , NULL );
+ 
+    ButtonDay_4 = CreateWindowEx ( 0 , "BUTTON" , "Czwartek" , WS_CHILD | WS_VISIBLE | BS_CHECKBOX | BS_AUTOCHECKBOX,
+                                  50 , 200 , 120 , 20 , hwnd , (HMENU) ID_CHECHBOX_4 , hInstance , NULL );
+ 
+    ButtonDay_5 = CreateWindowEx ( 0 , "BUTTON" , "Piatek" , WS_CHILD | WS_VISIBLE | BS_CHECKBOX | BS_AUTOCHECKBOX,
+                                  50 , 225 , 120 , 20 , hwnd , (HMENU) ID_CHECHBOX_5 , hInstance , NULL );
+ 
+    ButtonDay_6 = CreateWindowEx ( 0 , "BUTTON" , "Sobota" , WS_CHILD | WS_VISIBLE | BS_CHECKBOX | BS_AUTOCHECKBOX ,
+                                  50 , 250 , 120 , 20 , hwnd , (HMENU) ID_CHECHBOX_6 , hInstance , NULL );
+ 
+    ButtonDay_7 = CreateWindowEx ( 0 , "BUTTON" , "Niedziela" , WS_CHILD | WS_VISIBLE | BS_CHECKBOX | BS_AUTOCHECKBOX,
+                                  50 , 275 , 120 , 20 , hwnd , (HMENU) ID_CHECHBOX_7 , hInstance , NULL );
+ 
+    // WINDOW FOR TITLE SERIES
+    Text_Title = CreateWindowEx( WS_EX_CLIENTEDGE , "Edit" , NULL , WS_CHILD | WS_VISIBLE | WS_BORDER | ES_MULTILINE,
+                                50, 50, 200, 40,hwnd, NULL, hInstance, NULL );
+ 
+    // PLACE FOR ALL SAVE INFORMATION
+ 
+    Sub_List_STDH_TXT = CreateWindowEx (WS_EX_CLIENTEDGE , "STATIC" , NULL ,WS_CHILD | WS_VISIBLE | WS_BORDER | ES_MULTILINE | WS_VSCROLL | ES_AUTOHSCROLL ,
+                                     300 , 50 , 500 , 250 , hwnd , NULL, hInstance, NULL);
+ 
+    // TEXT INFORMATION LIST
+    List_STDH_ALL = CreateWindowEx ( 0 , "STATIC" , NULL , WS_CHILD | WS_VISIBLE | SS_LEFT ,
+                                 300 , 30 , 500 , 20 , hwnd , NULL , hInstance , NULL );
+ 
+    SetWindowText( List_STDH_ALL , "Wszystkie seriale ktore zostaly wprowadzone" ) ;
+ 
+    //TEXT MAIL ADRES
+ 
+        Text_Mail_Adres = CreateWindowEx( 0 , "Edit" , NULL , WS_CHILD | WS_VISIBLE | WS_BORDER | ES_MULTILINE,
+                                575, 475, 250, 20,hwnd, NULL, hInstance, NULL );
+ 
+ 
+    // TEXT INFORMATION  ( STATIC INFORMATION )
+ 
+    Sub_Text = CreateWindowEx (0 , "STATIC" , NULL , WS_CHILD | WS_VISIBLE | SS_LEFT ,
+                                50 , 30 , 200 , 20 , hwnd , NULL , hInstance , NULL);
+ 
+    SetWindowText( Sub_Text, "Wprowadz tytul serialu" ) ;
+ 
+    Sub_Day_Ch = CreateWindowEx ( 0 , "STATIC" , NULL , WS_CHILD | WS_VISIBLE | SS_LEFT ,
+                                50 , 95 , 200 , 20 , hwnd , NULL , hInstance , NULL );
+ 
+    SetWindowText( Sub_Day_Ch , "Wybierz dni tygodnia" ) ;
+ 
+    //HOURS AND MINUTES
+ 
+    Hour_TXT = CreateWindowEx (WS_EX_CLIENTEDGE , "Edit" , NULL ,WS_CHILD | WS_VISIBLE | WS_BORDER ,
+                                50 , 350 , 30 , 20 , hwnd , NULL, hInstance, NULL);
+ 
+    Minutes_TXT = CreateWindowEx (WS_EX_CLIENTEDGE , "Edit" , NULL ,WS_CHILD | WS_VISIBLE | WS_BORDER  ,
+                                75 , 350 , 30 , 20 , hwnd , NULL, hInstance, NULL);
+ 
+    //TEXT INFORMATION HOUR AND MINUTES
+ 
+    Sub_Hour_And_Minutes = CreateWindowEx ( 0 , "STATIC" , NULL , WS_CHILD | WS_VISIBLE | SS_LEFT ,
+                                 50 , 330 , 150 , 20 , hwnd , NULL , hInstance , NULL );
+ 
+    SetWindowText ( Sub_Hour_And_Minutes , "Podaj godzine i minuty");
+ 
+    if( hwnd == NULL )
+    {
+        MessageBox( NULL, 0, 0, MB_ICONEXCLAMATION );
+        return 1;
+    }
+ 
+    ShowWindow( hwnd, nCmdShow ); //
+    UpdateWindow( hwnd );
+ 
+    // COMIUNICATION LOOP
+    while( GetMessage( & Komunikat, NULL, 0, 0 ) )
+    {
+        TranslateMessage( & Komunikat );
+        DispatchMessage( & Komunikat );
+    }
+    return Komunikat.wParam;
+}
+ 
+// OBSŁUGA ZDARZEŃ
+LRESULT CALLBACK WndProc( HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam )
+{
+    switch( msg )
+    {
+    case WM_CREATE:
+ 
+ 
+ 
+    case WM_COMMAND:
+        switch( wParam )
+        {
+        case ID_SAVE_ALL:
+ 
+ 
+ 
+            int counter = 0;
+ 
+            //GET TITEL AND MOVE TO STRUCT
+ 
+            DWORD dlugosc = GetWindowTextLength( Text_Title );
+            LPSTR Bufor =( LPSTR ) GlobalAlloc ( GPTR , dlugosc + 1 );
+            GetWindowText( Text_Title , Bufor , dlugosc + 1 );
+ 
+            List_STDH[counter].Series_Title = Bufor;
+ 
+            //FREE ALLOC BUFOR
+ 
+            GlobalFree( Bufor );
+ 
+            //GET HOUR AND MOVE TO STRUCT
+ 
+            DWORD Godziny = GetWindowTextLength( Hour_TXT );
+            LPSTR Bufor1 =( LPSTR ) GlobalAlloc ( GPTR , Godziny + 1 );
+            GetWindowText( Hour_TXT , Bufor , Godziny + 1 );
+ 
+            List_STDH[counter].hours = Bufor1;
+ 
+            GlobalFree( Bufor1 );
+ 
+            //
+ 
+            DWORD Minuty = GetWindowTextLength( Minutes_TXT );
+            LPSTR Bufor2 =( LPSTR ) GlobalAlloc ( GPTR , Minuty + 1 );
+            GetWindowText( Minutes_TXT , Bufor2 , Minuty + 1 );
+ 
+            List_STDH[counter].minutes = Bufor2;
+ 
+            GlobalFree( Bufor2 );
+ 
+            //CHECH CHECKBOX
+ 
+                BOOL bChecked =( IsDlgButtonChecked( hwnd, ID_CHECHBOX_1 ) == BST_CHECKED );
+                if (bChecked == BST_CHECKED)
+                    {
+                        List_STDH[counter].Monday = true;
+                    }
+                else
+                    {
+                        List_STDH[counter].Monday = false;
+                    }
+                BOOL bChecked1 =( IsDlgButtonChecked( hwnd, ID_CHECHBOX_2 ) == BST_CHECKED );
+                if(bChecked1 == BST_CHECKED)
+                    {
+                        List_STDH[counter].Tuesday = true;
+                    }
+                else
+                    {
+                        List_STDH[counter].Tuesday = false;
+                    }
+                BOOL bChecked2 =( IsDlgButtonChecked( hwnd, ID_CHECHBOX_3 ) == BST_CHECKED );
+                if(bChecked2 == BST_CHECKED)
+                    {
+                        List_STDH[counter].Wednesday = true;
+                    }
+                else
+                    {
+                        List_STDH[counter].Wednesday = false;
+                    }
+                BOOL bChecked3 =( IsDlgButtonChecked( hwnd, ID_CHECHBOX_4 ) == BST_CHECKED );
+                if(bChecked3 == BST_CHECKED)
+                    {
+                        List_STDH[counter].Thursday = true;
+                    }
+                else
+                    {
+                        List_STDH[counter].Thursday = false;
+                    }
+                BOOL bChecked4 =( IsDlgButtonChecked( hwnd, ID_CHECHBOX_5 ) == BST_CHECKED );
+                if (bChecked4 == BST_CHECKED)
+                    {
+                        List_STDH[counter].Friday = true;
+                    }
+                else
+                    {
+                        List_STDH[counter].Friday = false;
+                    }
+                BOOL bChecked5 =( IsDlgButtonChecked( hwnd, ID_CHECHBOX_6 ) == BST_CHECKED );
+                if (bChecked5 == BST_CHECKED)
+                    {
+                        List_STDH[counter].Saturday = true;
+                    }
+                else
+                    {
+                        List_STDH[counter].Saturday = false;
+                    }
+                BOOL bChecked6 = ( IsDlgButtonChecked( hwnd, ID_CHECHBOX_7 ) == BST_CHECKED );
+                if (bChecked6 == BST_CHECKED)
+                    {
+                        List_STDH[counter].Sunday = true;
+                    }
+                else
+                    {
+                        List_STDH[counter].Sunday = false;
+                    }
+ 
+                List_STDH[counter].status = true;
+ 
+                counter++;
+ 
+            //INFORMATION ABOUT SAVE ALL ( EVERYTHING IS RIGHT )
+ 
+            MessageBox( hwnd, "Wszystko zostalo zapisane", "ZAPIS", MB_ICONINFORMATION );
+            break;
+ 
+            //case Save_Mail:
+            {
+ 
+            }
+        }
+        break;
+ 
+    case WM_CLOSE:
+        DestroyWindow( hwnd );
+        break;
+ 
+    case WM_DESTROY:
+        PostQuitMessage( 0 );
+        break;
+ 
+        default:
+        return DefWindowProc( hwnd, msg, wParam, lParam );
+    }
+ 
+    return 0;
+}
